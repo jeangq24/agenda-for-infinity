@@ -29,7 +29,6 @@ export default  ({ menuItems, setMenuItems }) => {
 
         menuFormat[index].selected = true;
         setMenuItems(menuFormat);
-        handleBurgerClick();
     }
     return (
         <div className="w-full h-full flex flex-col justify-between gap-5 lg:gap-10 p-10 bg-infinity-black-carbon overflow-auto z-10">
