@@ -1,6 +1,6 @@
 import { useUser } from "@/config/UserContext";
 import { useState, useEffect } from "react";
-import { getSchedules } from"@/config/schedule";
+import { getSchedules, putSchedule, deleteShedule } from"@/config/schedule";
 import { useSocket } from "@/config/socketContext";
 
 export const useSchedules = () => {
@@ -9,13 +9,22 @@ export const useSchedules = () => {
     const [schedules, setSchedules] = useState([]);
     
     const requestShedules = async () => { 
-        const {schedules} = await getSchedules()    
+        await getSchedules();  
+    };
+
+    const editSchedule = async(idSchedule, data) => {
+        const result = await putSchedule(idSchedule, data);
+        return result;
+    }
+
+    const dltSchedule = async(idSchedule) => {
+        const result = await deleteShedule(idSchedule);
+        return result;
     };
 
     useEffect(() => {
         if(user) {
             socketClient.on("getScheduleList", (schedules)=> {
-                console.log(schedules)
                 setSchedules(schedules || []);
             });
 
@@ -26,5 +35,5 @@ export const useSchedules = () => {
     
     }, [user, socketClient]); // El arreglo vacío [] asegura que esto solo se ejecute al montar/desmontar el componente
 
-    return { schedules };
+    return { schedules, editSchedule, dltSchedule };
 };

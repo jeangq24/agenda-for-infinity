@@ -25,12 +25,56 @@ export const getSchedules = async() => {
     };
 };
 
-export const putSchedule = () => {
+export const putSchedule = async(id, data) => {
+    try {
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_HOST}/${SCHEDULE}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id, ...data }),
+            credentials: "include"
+        });
+        
+        const result = await response.json();
+        
+        if(result?.error) {
+            toast.error(result.error);
+            return null;
+        };
 
+        return result;
+    } catch (error) {
+        console.log("postSchedule: ", error);
+        return false;
+    };
 };
 
-export const deleteShedule = () => {
+export const deleteShedule = async(id) => {
+    try {
+        
+        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_HOST}/${SCHEDULE}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id }),
+            credentials: "include"
+        });
+        
+        const result = await response.json();
+        
+        if(result?.error) {
+            toast.error(result.error);
+            return null;
+        };
 
+        return result;
+    } catch (error) {
+        console.log("postSchedule: ", error);
+        return false;
+    };
 };
 
 export const postSchedule = async(startTime, endTime, status, day, month, year) => {
@@ -46,8 +90,7 @@ export const postSchedule = async(startTime, endTime, status, day, month, year) 
         });
         
         const result = await response.json();
-        
-        console.log(result.error)
+    
         if(result?.error) {
             toast.error(result.error);
             return null;
