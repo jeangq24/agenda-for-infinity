@@ -47,6 +47,7 @@ const CardSchedule = ({ dataSchedule, editSchedule, deleteSchedule }) => {
     const daySchedule = dataSchedule?.day;
     const monthSchedule = dataSchedule?.month;
     const yearSchedule = dataSchedule?.year;
+    const defaultSchedule = dataSchedule?.default;
 
     const { isOpen: isDeleteOpen, onOpen: onOpenDelete, onOpenChange: onOpenChangeDelete } = useDisclosure();
     const { isOpen: isEditOpen, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit } = useDisclosure();
@@ -84,12 +85,23 @@ const CardSchedule = ({ dataSchedule, editSchedule, deleteSchedule }) => {
         <Card className="z-0 bg-infinity-white-snow h-[270px] w-full md:w-80 flex flex-col gap-3">
             <CardHeader className="z-0 w-full h-16 rounded-t-2xl bg-infinity-black-carbon flex flex-row justify-between items-center px-4">
                 <span className="text-infinity-pink-lightPink font-bold">
-                    {`${daySchedule}-${monthSchedule}-${yearSchedule}`}
+                    {defaultSchedule ? "Perdeterminado" : `${daySchedule}-${monthSchedule}-${yearSchedule}`}
                 </span>
                 <div className="w-auto flex flex-row justify-end items-center gap-3">
-                    <Trash onClick={onOpenChangeDelete} className={`${classNamaHeadIconButton} bg-infinity-pink-softPink`} />
+                    <Trash 
+                    onClick={()=>{
+                        if(defaultSchedule) {
+                            return toast.error("El horario predeterminado no se puede eliminar");
+                        };
+                        onOpenChangeDelete(!isDeleteOpen)
+                    }} 
+                    className={`${classNamaHeadIconButton} bg-infinity-pink-softPink`}
+                     />
                     <Gear className={`${classNamaHeadIconButton} ${cardEditStatus ? "bg-infinity-pink-salmonPink/90" : "bg-infinity-pink-softPink"}`}
                         onClick={() => {
+                            if(defaultSchedule) {
+                                return toast.error("El horario predeterminado no se puede editar");
+                            }
                             if (!rangeDate(daySchedule, monthSchedule, yearSchedule)) {
                                 return toast.error("Este horario caduco, no se puede editar");
                             };
@@ -181,7 +193,7 @@ const CardSchedule = ({ dataSchedule, editSchedule, deleteSchedule }) => {
                     isOpen={isDeleteOpen}
                     onOpen={onOpenDelete}
                     onOpenChange={onOpenChangeDelete}
-                    titleHead={"¿Desea eliminar este horario?"}
+                    titleHead={`¿Desea eliminar el horario con la fecha: ${daySchedule}-${monthSchedule}-${yearSchedule}?`}
                     labelAction={"Eliminar"}
                     handleAction={async() => {
                         const result = await deleteSchedule(idSchedule);
@@ -199,7 +211,7 @@ const CardSchedule = ({ dataSchedule, editSchedule, deleteSchedule }) => {
                     isOpen={isEditOpen}
                     onOpen={onOpenEdit}
                     onOpenChange={onOpenChangeEdit}
-                    titleHead={"¿Desea editar este horario?"}
+                    titleHead={`¿Desea editar el horario con la fecha: ${daySchedule}-${monthSchedule}-${yearSchedule}?`}
                     labelAction={"Editar"}
                     handleAction={() => onSubmitEdit()}
                 >
