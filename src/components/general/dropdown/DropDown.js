@@ -22,7 +22,7 @@ export default ({ listItems, textLabel, setValue, value, children }) => {
       <Dropdown
         backdrop="blur"
         className="overflow-auto"
-      >
+        >
         <DropdownTrigger>
           <Button
             
@@ -48,7 +48,7 @@ export default ({ listItems, textLabel, setValue, value, children }) => {
           {listItems?.map((items) => {
             return (
               <DropdownItem
-                className="w-full text-center"
+                className="w-full text-start"
                 key={items}
               >
                 {items}
