@@ -5,14 +5,15 @@ import MenuPanelAdmin from "./MenuPanelAdmin";
 import SchedulePanelAdmin from "./SchedulePanelAdmin";
 import ServicePanelAdmin from "./ServicePanelAdmin";
 import { useUser } from "@/config/UserContext";
+import TeamPanelAdmin from "./TeamPanelAdmin";
 export default () => {
     const {user} = useUser();
     const [menuItems, setMenuItems] = useState(
         [
             { id: "agenda", content: "Agenda", selected: false, Icon: <CalendarDots className="w-8 h-8" /> },
             { id: "horario", content: "Horario", selected: false, Icon: <Clock className="w-8 h-8" /> },
-            { id: "servicios", content: "Servicios", selected: true, Icon: <Package className="w-8 h-8" /> },
-            { id: "equipo", content: "Equipo de trabajo", selected: false, Icon: <UsersFour className="w-8 h-8" /> },
+            { id: "servicios", content: "Servicios", selected: false, Icon: <Package className="w-8 h-8" /> },
+            { id: "equipo", content: "Equipo de trabajo", selected: true, Icon: <UsersFour className="w-8 h-8" /> },
             { id: "cerrarSesion", content: "Cerrar Sesion", selected: false, Icon: <XCircle className="w-8 h-8" /> }
         ]
     )
@@ -28,6 +29,7 @@ export default () => {
                 {(menuItems[0].selected) && <TimePlanner />}
                 {(menuItems[1].selected) && <SchedulePanelAdmin />}
                 {(menuItems[2].selected && user?.rol === "admin") && <ServicePanelAdmin />}
+                {(menuItems[3].selected && user?.rol === "admin") && <TeamPanelAdmin />}
             </div>
         </div>
 

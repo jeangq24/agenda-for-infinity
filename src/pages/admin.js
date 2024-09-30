@@ -6,9 +6,6 @@ import FormLogin from "@/components/general/forms/FormLogin";
 
 export default () => {
     const{ user } = useUser();
-    useEffect(()=> {
-        console.log(user)
-    }, [user])
     return (
         <LayaoutContainer>
            {user ? <AdminPanel/> : <FormLogin/>}

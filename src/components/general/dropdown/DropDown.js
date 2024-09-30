@@ -43,7 +43,7 @@ export default ({ listItems, textLabel, setValue, value, children }) => {
           selectionMode="single"
           selectedKeys={selectedKeys}
           onSelectionChange={(e)=>{handleChange(e)}}
-          className="w-full h-96"
+          className="w-full min-h-auto h-96"
         >
           {listItems?.map((items) => {
             return (
