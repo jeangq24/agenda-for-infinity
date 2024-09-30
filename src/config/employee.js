@@ -1,21 +1,6 @@
-import { USER } from "@/config/index";
+import { USER, fetchWithErrorHandling } from "@/config/constants";
 import toast from "react-hot-toast";
 
-// Función general para manejar las peticiones
-const fetchWithErrorHandling = async (url, options) => {
-  try {
-    const response = await fetch(url, { credentials: "include", ...options });
-    const result = await response.json();
-    if (result?.error) {
-      toast.error(result.error);
-      return null;
-    }
-    return result;
-  } catch (error) {
-    console.error(`${options.method} request failed:`, error);
-    return false;
-  }
-};
 
 // Obtener empleados
 export const getEmployees = async () => {
