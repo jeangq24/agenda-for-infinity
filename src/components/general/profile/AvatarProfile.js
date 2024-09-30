@@ -1,6 +1,6 @@
 import { Avatar,  AvatarIcon } from "@nextui-org/avatar";
 
-export default ({name, size}) => {
+export default ({name, role, size}) => {
     return (
         <div className="w-full h-auto flex flex-row items-center justify-start gap-4">
             <Avatar
@@ -15,7 +15,11 @@ export default ({name, size}) => {
                 
             />
 
-            {name && <p className="text-infinity-pink-lightPink font-bold text-xl">{name}</p>}
+            {name &&
+            <div className="flex flex-col items-start justify-center">
+                <p className="text-infinity-pink-lightPink font-bold text-xl">{name}</p>
+                {role && <p className="text-infinity-black-slateGray font-bold text-sm">{role}</p>}
+            </div>}
         </div>
     )
 }
