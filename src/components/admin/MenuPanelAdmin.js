@@ -32,7 +32,6 @@ const MenuPanelAdmin = ({ menuItems, setMenuItems }) => {
         const updatedMenuItems = getMenuItems();
          // Resetea el menú
         updatedMenuItems[index].selected = true; // Marca el ítem seleccionado
-        console.log(updatedMenuItems)
         setMenuItems(updatedMenuItems);
     };
 
