@@ -1,80 +1,67 @@
-import { CalendarDots, Clock, Package, UsersFour, XCircle, Trash, Gear, Pulse, PlusCircle } from "@phosphor-icons/react";
 import AvatarProfile from "@/components/general/profile/AvatarProfile";
 import { useUser } from "@/config/UserContext";
 import { useBurgerMenu } from "@/config/BurgerMenuContext";
+import { getMenuItems } from "@/lib/menuItems"; // Importamos los ítems del menú
 
-export default ({ menuItems, setMenuItems }) => {
+
+// Documentación del componente
+/**
+ * MenuPanelAdmin es el componente que renderiza el menú de navegación para un panel de administración,
+ * mostrando diferentes ítems según el rol del usuario.
+ * @param {Array} menuItems - Los ítems del menú que se mostrarán.
+ * @param {Function} setMenuItems - Función para actualizar los ítems del menú.
+ */
+
+const MenuPanelAdmin = ({ menuItems, setMenuItems }) => {
     const { logout, user } = useUser();
     const { handleBurgerClick } = useBurgerMenu();
-    const classNameItemActive = `w-full py-3 md:py-5 bg-infinity-pink-salmonPink rounded-2xl px-3 text-infinity-white-snow flex flex-row justify-between item-center gap-2 cursor-pointer transition duration-700`;
-    const classNameItemInactive = `w-full py-3 md:py-5 hover:bg-infinity-pink-softPink hover:text-infinity-white-snow rounded-2xl px-3 flex flex-row justify-between item-center gap-2 cursor-pointer transition duration-700`;
+    // Genera la clase CSS para ítems activos e inactivos
+    const getMenuItemClassName = (isActive) =>
+        `w-full py-3 md:py-5 ${isActive ? 'bg-infinity-pink-salmonPink text-infinity-white-snow' : 'hover:bg-infinity-pink-softPink hover:text-infinity-white-snow'} 
+    rounded-2xl px-3 flex flex-row justify-between items-center gap-2 cursor-pointer transition duration-700`;
 
-    const classNameContainerNameItem = `w-full h-full flex items-center justify-start`;
 
-    const handleChangeSeletedMenu = async (item, index) => {
-
+    // Cambia el ítem seleccionado en el menú
+    const handleChangeSelectedMenu = async (item, index) => {
         if (item.id === "cerrarSesion") {
             await logout();
             handleBurgerClick();
             return;
-        };
+        }
 
-        const menuFormat = [
-            { id: "agenda", content: "Agenda", selected: false, Icon: <CalendarDots className="w-8 h-8" /> },
-            { id: "horario", content: "Horario", selected: false, Icon: <Clock className="w-8 h-8" /> },
-            { id: "servicios", content: "Servicios", selected: false, Icon: <Package className="w-8 h-8" /> },
-            { id: "equipo", content: "Equipo de trabajo", selected: false, Icon: <UsersFour className="w-8 h-8" /> },
-            { id: "cerrarSesion", content: "Cerrar Sesion", selected: false, Icon: <XCircle className="w-8 h-8" /> }
-        ];
+        const updatedMenuItems = getMenuItems();
+         // Resetea el menú
+        updatedMenuItems[index].selected = true; // Marca el ítem seleccionado
+        setMenuItems(updatedMenuItems);
+    };
 
-        menuFormat[index].selected = true;
-        setMenuItems(menuFormat);
-    }
+    // Renderiza los ítems del menú según el rol del usuario
+    const renderMenuItems = () => {
+        return menuItems
+            .filter((item) => user?.rol === "admin" || ["agenda", "horario", "cerrarSesion"].includes(item.id)) // Filtra por rol
+            .map((item, index) => (
+                <li
+                    key={item.id + "_items"}
+                    className={getMenuItemClassName(item.selected)} // Aplica clase activa o inactiva
+                    onClick={() => handleChangeSelectedMenu(item, index)}
+                >
+                    {item?.Icon}
+                    <div className="w-full h-full flex items-center justify-start">{item.content}</div>
+                </li>
+            ));
+    };
+
     return (
         <div className="w-full h-full flex flex-col justify-between gap-5 lg:gap-10 p-10 bg-infinity-black-carbon overflow-auto z-10">
-            <AvatarProfile
-                size={14}
-                name={user?.name}
+            {/* Avatar del perfil */}
+            <AvatarProfile size={14} name={user?.name} role={user?.rolId}/>
 
-            />
-
+            {/* Ítems del menú */}
             <ul className="text-infinity-pink-lightPink w-full h-full flex flex-col justify-items font-poppins font-bold gap-2 md:gap-5 lg:gap-10">
-                {user?.rol === "admin" ? menuItems?.map((item, index) => {
-                    return (
-                        <li
-                            key={item.id + "_items"}
-                            className={item.selected ? classNameItemActive : classNameItemInactive}
-                            onClick={() => {
-                                handleChangeSeletedMenu(item, index)
-                            }}
-                        >
-                            {item?.Icon}
-                            <div className={classNameContainerNameItem}>{item.content}</div>
-                        </li>
-                    )
-                })
-                    :
-                    menuItems.filter((item) => {
-                        if (item.id === "agenda" || item.id === "horario" || item.id === "cerrarSesion") {
-                            return true;
-                        };
-                    }).map((item, index) => {
-                        return (
-                            <li
-                                key={item.id + "_items"}
-                                className={item.selected ? classNameItemActive : classNameItemInactive}
-                                onClick={() => {
-                                    handleChangeSeletedMenu(item, index)
-                                }}
-                            >
-                                {item?.Icon}
-                                <div className={classNameContainerNameItem}>{item.content}</div>
-                            </li>
-                        )
-                    })
-                }
+                {renderMenuItems()}
             </ul>
         </div>
-
-    )
+    );
 };
+
+export default MenuPanelAdmin;

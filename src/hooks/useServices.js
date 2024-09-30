@@ -1,43 +1,51 @@
 import { useUser } from "@/config/UserContext";
-import { useState, useEffect } from "react";
-import { getServices, postService, deleteService, putService } from"@/config/service";
+import { useState, useEffect, useCallback } from "react";
+import { getServices, postService, deleteService, putService } from "@/config/service";
 import { useSocket } from "@/config/socketContext";
 
-export const useServices = () => {
+export const useServices = (initialServices) => {
     const { user } = useUser();
     const socketClient = useSocket();
-    const [services, setServices] = useState([]);
-    
-    const requestServices = async () => { 
-        await getServices();  
-    };
+    const [services, setServices] = useState(initialServices || []);
 
-    const editService = async(idService, data) => {
+    // Función para manejar la obtención de horarios
+    const requestServices = useCallback(async () => {
+        await getServices();
+    }, []);
+
+    // Manejo de edición de horarios
+    const editService = useCallback(async (idService, data) => {
         const result = await putService(idService, data);
         return result;
-    }
+    }, []);
 
-    const dltService = async(idService) => {
+    // Manejo de eliminación de horarios
+    const dltService = useCallback(async (idService) => {
         const result = await deleteService(idService);
         return result;
-    };
+    }, []);
 
-    const addService = async (data) => {
-        const result = await postService(data)
+    // Manejo de creación de horarios
+    const addService = useCallback(async (data) => {
+        const result = await postService(data);
         return result;
-    };
+    }, []);
 
     useEffect(() => {
-        if(user) {
-            socketClient.on("getServicesList", (services)=> {
+        if (user) {
+            socketClient.on("getServicesList", (services) => {
                 setServices(services || []);
             });
 
-            if(services.length === 0) {
+            if (services.length === 0) {
                 requestServices();
             };
+
+            return ()=> {
+                socketClient.off("getServicesList");
+            };
         };
-    
+
     }, [user, socketClient]); // El arreglo vacío [] asegura que esto solo se ejecute al montar/desmontar el componente
 
     return { services, editService, dltService, addService };

@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { listTimes } from "@/lib/times";
 export default ({ date, agenda }) => {
   const lineTime = useRef(null);
   const pingLineTime = useRef(null);
@@ -8,15 +9,7 @@ export default ({ date, agenda }) => {
   const endTime = 24; // Hora de fin del día
   const interval = 30; // Intervalo en minutos
 
-  const timeSlots = [];
-  for (let hour = startTime; hour <= endTime; hour++) { // Cambia < a <= para incluir endTime
-    for (let minute = 0; minute < 60; minute += interval) {
-      // Evita añadir slots después de la hora final
-      if (hour === endTime && minute > 0) break;
-      const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      timeSlots.push(time);
-    }
-  }
+  const timeSlots = listTimes;
   useEffect(() => {
     const updateLineTimePosition = () => {
       const now = new Date();

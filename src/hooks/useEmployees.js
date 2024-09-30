@@ -14,14 +14,14 @@ export const useEmployees = (initialEmployees) => {
   }, []);
 
   // Manejo de edición de empleados
-  const editEmployee = useCallback(async (idService, data) => {
-    const result = await putEmployee(idService, data);
+  const editEmployee = useCallback(async (idEmployee, data) => {
+    const result = await putEmployee(idEmployee, data);
     return result;
   }, []);
 
   // Manejo de eliminación de empleados
-  const dltEmployee = useCallback(async (idService) => {
-    const result = await deleteEmployee(idService);
+  const dltEmployee = useCallback(async (idEmployee) => {
+    const result = await deleteEmployee(idEmployee);
     return result;
   }, []);
 
