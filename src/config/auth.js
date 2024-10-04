@@ -11,7 +11,7 @@ export const loginFunction = async (userNameValue, passwordValue, setUser, Route
             body: JSON.stringify({ userName: userNameValue, password: passwordValue }),
             credentials: 'include',
         });
-        console.log(response)
+       
         const result = await response.json();
         if (result?.error) {
             toast.error(result?.error)

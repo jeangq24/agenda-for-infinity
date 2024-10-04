@@ -1,7 +1,9 @@
+import toast from "react-hot-toast";
 export const SCHEDULE = "schedules";
 export const USER = "users";
 export const SERVICE = "products";
 export const QUOTE = "quotes";
+export const AGENDA = "agenda";
 export const AUTH  = {
     AUTH: "auth",
     LOGOUT: "logout",
