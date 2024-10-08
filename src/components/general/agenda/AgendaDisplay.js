@@ -22,12 +22,14 @@ export default ({ initialEmployeesAgenda, date }) => {
   const pingLineTime = useRef(null);
   const contenedorAgenda = useRef(null);
   const [filter, setFilter] = useState("Todos");
-  const { 
-    employeesAgenda, 
-    employeesNames, 
-    selectFilter, 
+  const {
+    employeesAgenda,
+    employeesNames,
+    selectFilter,
     services,
-    addQuote } = useEmployeesAgenda(initialEmployeesAgenda, date, filter);
+    addQuote,
+    editQuote
+  } = useEmployeesAgenda(initialEmployeesAgenda, date, filter);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [formDataAddQuote, setFormDataAddQuote] = useState({
     startTime: "",
@@ -35,42 +37,42 @@ export default ({ initialEmployeesAgenda, date }) => {
     products: [],
     userId: null,
     clientId: null,
-    day: date?.day,
-    month: date?.month,
-    year: date?.year,
+
   });
 
-  const onSubmitQuote = async() => {
-    const {startTime, endTime, products, userId, day, month, year} = formDataAddQuote;
-    if(!startTime.length || !endTime.length || !userId || !day || !month || !year || !products.length) {
+  const onSubmitQuote = async () => {
+    const { day, month, year } = date;
+    const { startTime, endTime, products, userId } = formDataAddQuote;
+    if (!startTime.length || !endTime.length || !userId || !day || !month || !year || !products.length) {
       toast.error("Seleccione uno mas productos para continuear");
     };
 
-    const result = await addQuote({startTime, endTime, products, userId, clientId: null, status: true, day, month, year});
-    if(result) {
+    const result = await addQuote({ startTime, endTime, products, userId, clientId: null, status: true, day, month, year });
+    if (result) {
       toast.success("Cita generada con exito");
       onOpenChange(!isOpen)
     };
   };
-  
+
   return (
     <div className="w-full lg:w-[75%] lg:h-full h-[500px] relative rounded-2xl overflow-auto flex flex-col gap-4">
       <Header date={date} employeesNames={employeesNames} filter={filter} setFilter={setFilter} selectFilter={selectFilter} />
       <ScheduleContainer ref={contenedorAgenda}>
         <ScheduleList timeSlots={listTimes} >
           {employeesAgenda?.map((employee, index) => (
-            
-              <EmployeeSchedule
-                key={employee.id}
-                employee={employee}
-                employeeIndex={index}
-                totalEmployees={employeesAgenda.length}
-                onOpenChange={onOpenChange}
-                setFormData={setFormDataAddQuote}
-                formData={formDataAddQuote}
-              />
 
-            
+            <EmployeeSchedule
+              key={employee.id}
+              employee={employee}
+              employeeIndex={index}
+              totalEmployees={employeesAgenda.length}
+              onOpenChange={onOpenChange}
+              setFormData={setFormDataAddQuote}
+              formData={formDataAddQuote}
+              editQuote={editQuote}
+            />
+
+
           ))}
           <TimeLine lineTime={lineTime} pingLineTime={pingLineTime} contenedorAgenda={contenedorAgenda} />
         </ScheduleList>

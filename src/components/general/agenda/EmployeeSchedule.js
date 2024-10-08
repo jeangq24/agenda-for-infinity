@@ -3,7 +3,8 @@ import AppointmentCard from "./AppointmentCard";
 import { useDates } from "@/hooks/useCalendar";
 import { User } from "@phosphor-icons/react";
 import { Tooltip } from "@nextui-org/react";
-export default ({ employee, employeeIndex, totalEmployees, onOpenChange, formData, setFormData }) => {
+import toast from "react-hot-toast";
+export default ({ employee, employeeIndex, totalEmployees, onOpenChange, formData, setFormData, editQuote }) => {
     const { timeToMinutes, minutesToTime } = useDates();
     const employeeSchedule = employee?.schedules;
     const employeeAppointments = employee?.appointments;
@@ -32,7 +33,43 @@ export default ({ employee, employeeIndex, totalEmployees, onOpenChange, formDat
         // Convertir los minutos a una hora cercana disponible
         const closestTime = minutesToTime(clickedMinutes);
         setFormData({...formData, startTime: closestTime, endTime: "", userId: employee.id, products: []})
-        onOpenChange(true); // Abrir el modal o cualquier otra acción
+        onOpenChange(true); // Abrir el modal
+    };
+
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        const appointmentId = e.dataTransfer.getData("appointmentId");
+    
+        const offsetY = e.nativeEvent.offsetY;
+        const droppedInterval = Math.floor(offsetY / 60);
+        const droppedMinutes = startMinutesSchedule + (droppedInterval * 30);
+        const newStartTime = minutesToTime(droppedMinutes);
+    
+        // Busca la cita en la lista de citas del empleado para obtener la duración original
+        const appointment = employeeAppointments.find(app => app.quote.id === Number(appointmentId));
+        
+        if (!appointment) {
+            console.error("Appointment not found");
+            return;
+        }
+        const {day, month, year } = appointment.quote;
+        // Calcula la duración original de la cita en minutos
+        const originalStartMinutes = timeToMinutes(appointment.quote.start_time);
+        const originalEndMinutes = timeToMinutes(appointment.quote.end_time);
+        const duration = originalEndMinutes - originalStartMinutes;
+    
+        // Calcula la nueva hora de fin basada en la nueva hora de inicio y la duración original
+        const newEndTime = minutesToTime(droppedMinutes + duration);
+        const result = await editQuote(Number(appointmentId), {startTime: newStartTime, endTime: newEndTime, day, month, year})
+        if(result) {
+            toast.success(`Horario de agenda cambio con exito: ${newStartTime} - ${newEndTime}`);
+        };
+        
+    };
+    
+
+    const handleDragOver = (e) => {
+        e.preventDefault(); // Permitir que el evento de soltar ocurra
     };
 
     return (
@@ -46,6 +83,8 @@ export default ({ employee, employeeIndex, totalEmployees, onOpenChange, formDat
                     left: `calc(${employeeIndex * 100 / totalEmployees}% + ${employeeIndex * 5}px)`,
                     width: slotWidthCardSchedules,
                 }}
+                onDrop={handleDrop} // Evento para manejar cuando se suelte la cita
+                onDragOver={handleDragOver} // Evento para permitir soltar
             >
                 <div
                     onClick={toggleExpand}

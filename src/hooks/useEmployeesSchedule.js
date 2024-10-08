@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getEmployeesAgenda } from "@/config/agenda";
 import { useSocket } from "@/config/socketContext";
 import { useServices } from "@/hooks/useServices";
-import { postQuote } from "@/config/quote";
+import { postQuote, putQuote } from "@/config/quote";
 
 export const useEmployeesAgenda = (initialEmployeesAgenda, date, filter) => {
     const [employeesAgendaFull, setEmployeesAgendaFull] = useState(initialEmployeesAgenda || [])
@@ -25,29 +25,29 @@ export const useEmployeesAgenda = (initialEmployeesAgenda, date, filter) => {
         const getScheduleForDate = (schedules) => {
             // Buscar el horario específico de la fecha
             let schedule = schedules.find((schedule) => (
-                schedule.day === date.day && 
-                schedule.month === date.month && 
-                schedule.year === date.year && 
+                schedule.day === date.day &&
+                schedule.month === date.month &&
+                schedule.year === date.year &&
                 schedule.default === false
             ));
-    
+
             // Si no hay horario específico, buscar el horario por defecto
             if (!schedule) {
                 schedule = schedules.find((schedule) => schedule.default === true);
             }
-    
+
             return schedule;
         };
-    
+
         const getAppointmentsForDate = (appointments) => {
-       
+
             return appointments.filter((appointment) => (
-                appointment.quote.day === date.day && 
-                appointment.quote.month === date.month && 
+                appointment.quote.day === date.day &&
+                appointment.quote.month === date.month &&
                 appointment.quote.year === date.year
             ));
         };
-    
+
         const employeesAgendaDay = (filter === "Todos")
             ? employeesWithSchedulesAndQoutes.map((employee) => {
                 const schedule = getScheduleForDate(employee.schedules);
@@ -61,10 +61,10 @@ export const useEmployeesAgenda = (initialEmployeesAgenda, date, filter) => {
                     const appointments = getAppointmentsForDate(employee.appointments);
                     return { ...employee, schedules: schedule, appointments };
                 });
-    
+
         setEmployeesAgenda(employeesAgendaDay || []);
     }, [date, filter]);
-    
+
 
     const selectFilter = useCallback(async () => {
         generateEmployeeDailyData(employeesAgendaFull);
@@ -73,7 +73,12 @@ export const useEmployeesAgenda = (initialEmployeesAgenda, date, filter) => {
     const addQuote = useCallback(async (data) => {
         const result = await postQuote(data);
         return result;
-      }, [])
+    }, [date])
+
+    const editQuote = useCallback(async (id, data) => {
+        const result = await putQuote(id, data);
+        return result;
+    }, [date])
 
     useEffect(() => {
         if (employeesAgendaFull) {
@@ -98,7 +103,7 @@ export const useEmployeesAgenda = (initialEmployeesAgenda, date, filter) => {
             // Petición inicial de empleados si la lista está vacía
             if (employeesAgenda.length === 0) {
                 requestEmployeeAgenda();
-            }else {
+            } else {
                 generateEmployeeDailyData(employeesAgendaFull);
             }
 
@@ -117,6 +122,7 @@ export const useEmployeesAgenda = (initialEmployeesAgenda, date, filter) => {
         selectFilter,
         loading,
         services,
-        addQuote
+        addQuote,
+        editQuote
     };
 };
