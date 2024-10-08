@@ -1,6 +1,4 @@
 import { USER, fetchWithErrorHandling } from "@/config/constants";
-import toast from "react-hot-toast";
-
 
 // Obtener empleados
 export const getEmployees = async () => {

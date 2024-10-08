@@ -1,28 +1,44 @@
-import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
+import { today, getLocalTimeZone } from "@internationalized/date";
 import { useState } from "react";
 
-
+// Hook principal
 export const useCalendar = () => {
     const currentDate = today(getLocalTimeZone());
     const twoMonthsLater = currentDate.add({ months: 2 });
     const [selectedDate, setSelectedDate] = useState(currentDate);
-    const [agenda, setAgenda] = useState(['09:00', '10:30', '14:00']);
+    const [agenda, setAgenda] = useState([]);
+    const [employees, setEmployees] = useState([]);
 
-
-
+    // Función para manejar la selección de una fecha en el calendario
     const handleDateSelect = (date) => {
         setSelectedDate(date);
-        // Aquí podrías hacer una llamada a la API para obtener la agenda para el día seleccionado
-        const exampleAgenda = getAgendaForDate(date); // función ficticia para obtener la agenda
+        // Aquí podrías hacer una llamada a la API para obtener la agenda y empleados para el día seleccionado
+        const exampleAgenda = getAgendaForDate(date);
+        const exampleEmployees = getEmployeesForDate(date); // Obtener empleados para ese día
         setAgenda(exampleAgenda);
+        setEmployees(exampleEmployees);
     };
 
+    // Simulación de obtener horarios y citas
     const getAgendaForDate = (date) => {
-        // Simulación de datos, deberías reemplazarlo con una llamada a la API o a la base de datos
-        const unavailableSlots = ['09:00', '10:30', '14:00'];
-        return unavailableSlots;
+        // Simulación de citas. Reemplaza esto con una llamada a la API o base de datos.
+        const appointments = [
+            { employeeId: 1, time: '09:00', service: 'Corte de cabello' },
+            { employeeId: 2, time: '10:30', service: 'Manicure' },
+            { employeeId: 1, time: '14:00', service: 'Peinado' }
+        ];
+        return appointments;
     };
 
+    // Simulación de obtener empleados y sus horarios para una fecha específica
+    const getEmployeesForDate = (date) => {
+        // Simulación de empleados y horarios. Reemplaza esto con una llamada a la API o base de datos.
+        const employees = [
+            { id: 1, name: 'Estilista 1', startTime: '08:00', endTime: '16:00' },
+            { id: 2, name: 'Estilista 2', startTime: '09:00', endTime: '18:00' }
+        ];
+        return employees;
+    };
 
     const isDateUnavailable = (date) => {
         return (
@@ -37,9 +53,11 @@ export const useCalendar = () => {
         currentDate,
         twoMonthsLater,
         handleDateSelect,
-        agenda
+        agenda,
+        employees
     };
 };
+
 
 export const useDates = () => {
     const currentDate = today(getLocalTimeZone());
@@ -85,5 +103,38 @@ export const useDates = () => {
         return hours * 60 + minutes;
     };
 
-    return { currentDate, twoMonthsLater, rangeDate, validateTimeRange }
-}
+    const minutesToTime = (minutes) => {
+        // Redondear los minutos al múltiplo más cercano de 30
+        const roundedMinutes = Math.round(minutes / 30) * 30;
+
+        const hours = Math.floor(roundedMinutes / 60); // Convertir minutos a horas
+        const remainingMinutes = roundedMinutes % 60;  // Obtener los minutos restantes (puede ser 00 o 30)
+
+        // Formatear las horas y minutos para que siempre tengan 2 dígitos
+        const formattedHours = String(hours).padStart(2, "0");
+        const formattedMinutes = String(remainingMinutes).padStart(2, "0");
+
+        // Devolver el tiempo en formato "HH:mm"
+        return `${formattedHours}:${formattedMinutes}`;
+    };
+
+    function calculateEndTime(startTime, minutesToAdd) {
+        // Convertir la hora inicial en un objeto Date
+        const [hours, minutes] = startTime.split(':').map(Number);
+        let date = new Date();
+        date.setHours(hours);
+        date.setMinutes(minutes);
+
+        // Sumar los minutos a la hora inicial
+        date.setMinutes(date.getMinutes() + minutesToAdd);
+
+        // Obtener la hora y minutos finales con formato de dos dígitos
+        const finalHours = String(date.getHours()).padStart(2, '0');
+        const finalMinutes = String(date.getMinutes()).padStart(2, '0');
+
+        // Retornar la hora final
+        return `${finalHours}:${finalMinutes}`;
+    };
+
+    return { currentDate, twoMonthsLater, rangeDate, validateTimeRange, timeToMinutes, minutesToTime, calculateEndTime };
+};
